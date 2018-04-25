@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
-
+import time
 
 # Specifying incognito mode as you launch your browser[OPTIONAL]
 option = webdriver.ChromeOptions()
@@ -17,6 +17,11 @@ browser.get("https://angel.co/bangalore")
 # Wait 20 seconds for page to load
 timeout = 20
 
+page = 2;
+
+# set the timeout for the ajax request or else you will get a TimeoutException
+browser.set_script_timeout(timeout);
+
 try:
     # Wait until the final element [Avatar link] is loaded.
     # Assumption: If Avatar link is loaded, the whole page would be relatively loaded because it is among
@@ -26,8 +31,17 @@ except TimeoutException:
     print("Timed out waiting for page to load")
     browser.quit()
 
-# set the timeout for the ajax request or else you will get a TimeoutException
-browser.set_script_timeout(timeout);
+while True :
+    # read the script
+    script = open('./javascript/inject.js', 'r').read() + ";initAjax(" + str(page) + ");"
 
-# execute the script
-browser.execute_async_script(open('./javascript/inject.js', 'r').read())
+    # execute the script
+    browser.execute_script(script)
+    page = page + 1
+    time.sleep(3)
+
+    if (len(browser.find_elements(By.XPATH, "//div[contains(@class, 'results_holder')]//div"))) == 1:
+        break
+
+browser.quit()
+
