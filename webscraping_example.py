@@ -32,6 +32,11 @@ except TimeoutException:
     browser.quit()
 
 while True :
+    links = browser.find_elements(By.XPATH, "//div[contains(@class, 'results_holder')]//div[contains(@class, 'name')]/a")
+
+    for link in links :
+      print(link.get_attribute("href"))
+
     # read the script
     script = open('./javascript/inject.js', 'r').read() + ";initAjax(" + str(page) + ");"
 
@@ -40,8 +45,14 @@ while True :
     page = page + 1
     time.sleep(3)
 
-    if (len(browser.find_elements(By.XPATH, "//div[contains(@class, 'results_holder')]//div"))) == 1:
+    results = browser.find_elements(By.XPATH, "//div[contains(@class, 'results_holder')]//div")
+    if (len(results)) == 1:
         break
+
+    # for elm in results :    
+        # print(elm.find_element_by_xpath("//div[contains(@class, 'results_holder')]//div//div[contains(@class, 'name')]/a/@href").extract_first()) 
+
+
 
 browser.quit()
 
